@@ -134,14 +134,14 @@ module.exports = (env, argv) => {
     },
     resolveLoader: {
       alias: {
-        'firmware-loader': path.join(__dirname, "src", 'firmware-loader.js')
+        'firmware-loader': path.join(__dirname, "loaders", 'firmware-loader.js')
       }
     },
     output: {
       path: internalPath,
       filename: '[contenthash].js',
       sourceMapFilename: '[contenthash].map',
-      devtoolNamespace: 'dantheman827.github.io/ntag215-puck.js',
+      devtoolNamespace: 'amoeba',
       devtoolModuleFilenameTemplate: 'https://[namespace]/[resource-path]'
     }
   }
