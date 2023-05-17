@@ -1,4 +1,4 @@
-const template: (options?: ModalTemplateOptions) => string = require("./templates/modal.pug")
+const template: (options?: ModalTemplateOptions) => string = require("../templates/modal.pug")
 const $ = require("jquery") as JQueryStatic
 
 let body: JQuery<HTMLElement>

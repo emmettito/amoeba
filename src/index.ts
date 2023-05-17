@@ -1,13 +1,13 @@
 require("./style/main.scss")
 
-import { getBlankNtag } from "./ntag215"
-import { Puck } from "./puck"
-import { showModal, hideModal, setModal, ModalButtonTypes, ModalResult } from "./modal"
-import { saveData, readFile } from "./fileHelpers"
-import { supportsBluetooth, bluetoothOrError } from "./browserCheck"
-import { SecureDfuUpdate, SecureDfuUpdateMessage, SecureDfuUpdateProgress } from "./SecureDfuUpdate"
-import * as EspruinoHelper from "./espruino"
-import { ModalMessageType, modalMessages } from "./modalMessages"
+import { getBlankNtag } from "./utils/ntag215"
+import { Puck } from "./utils/puck"
+import { showModal, hideModal, setModal, ModalButtonTypes, ModalResult } from "./utils/modal"
+import { saveData, readFile } from "./utils/fileHelpers"
+import { supportsBluetooth, bluetoothOrError } from "./utils/browserCheck"
+import { SecureDfuUpdate, SecureDfuUpdateMessage, SecureDfuUpdateProgress } from "./utils/SecureDfuUpdate"
+import * as EspruinoHelper from "./utils/espruino"
+import { ModalMessageType, modalMessages } from "./utils/modalMessages"
 
 const slotTemplate = require("./templates/slot.pug")
 

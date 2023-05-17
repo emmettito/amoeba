@@ -15,7 +15,7 @@ export interface SecureDfuUpdateMessage {
 }
 
 function getFirmware(): Promise<ArrayBuffer> {
-  return require("./firmware/espruino_2v15.767_puckjs_minimal.zip")
+  return require("../firmware/espruino_2v15.767_puckjs_minimal.zip")
 }
 
 export class SecureDfuUpdate {
