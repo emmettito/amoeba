@@ -2,26 +2,24 @@ require("./style/main.scss")
 
 import { getBlankNtag } from "./ntag215"
 import { Puck } from "./puck"
-import { showModal, hideModal, setModal, ModalShowOptions, ModalButtonTypes, ModalResult } from "./modal"
+import { showModal, hideModal, setModal, ModalButtonTypes, ModalResult } from "./modal"
 import { saveData, readFile } from "./fileHelpers"
 import { supportsBluetooth, bluetoothOrError } from "./browserCheck"
-import { EspruinoBoards, SecureDfuUpdate, SecureDfuUpdateMessage, SecureDfuUpdateProgress } from "./SecureDfuUpdate"
+import { SecureDfuUpdate, SecureDfuUpdateMessage, SecureDfuUpdateProgress } from "./SecureDfuUpdate"
 import * as EspruinoHelper from "./espruino"
 import { ModalMessageType, modalMessages } from "./modalMessages"
-import { selectText, selectThis } from "./selectText"
 
-const toArrayBuffer = require("arraybuffer-loader/lib/to-array-buffer.js")
 const slotTemplate = require("./templates/slot.pug")
-const boardTemplate = require("./templates/board-selector.pug")
 
 const anyWindow = (window as any)
 const puck = anyWindow.puck = new Puck(console.log, console.warn, console.error)
 
+// TODO retrieve from export
+const firmwareName = "dtm-1.0.1";
+
 $(() => {
   const mainContainer = $("#mainContainer")
   const slotsContainer = $("#slotsContainer")
-  const scriptTextArea = $("#code")
-  const firmwareName = $("#code").text().match(/const FIRMWARE_NAME = \"([^"]+)\";/)[1]
 
   if (supportsBluetooth !== true) {
     showModal({
@@ -29,23 +27,6 @@ $(() => {
       message: supportsBluetooth,
       htmlEscapeBody: false
     })
-  }
-
-  if (__DEVELOPMENT__) {
-    anyWindow.debug = {
-      ...(anyWindow.debug || { }),
-      ...{
-        EspruinoHelper,
-        hardwareChooser,
-        hideModal,
-        modalMessages,
-        puck,
-        readFile,
-        saveData,
-        setModal,
-        showModal,
-      }
-    }
   }
 
   async function populateSlots() {
@@ -268,44 +249,6 @@ $(() => {
     }
   }
 
-  async function hardwareChooser(): Promise<EspruinoBoards> {
-    const boards = [
-      {
-        name: "Bangle.js",
-        value: EspruinoBoards.BangleJS
-      },
-      {
-        name: "Bangle.js 2",
-        value: EspruinoBoards.BangleJS2
-      },
-      {
-        name: "Pixl.js",
-        value: EspruinoBoards.PixlJS
-      },
-      {
-        name: "Puck.js",
-        value: EspruinoBoards.PuckJSMinimal,
-        selected: true
-      }
-    ]
-
-    const html = $(boardTemplate({ boards }))
-    const selector = html.find("select")
-
-    const result = await showModal({
-      title: "Select your board",
-      message: html,
-      dialog: true,
-      buttons: ModalButtonTypes.Next
-    })
-
-    if (result === ModalResult.ButtonNext) {
-      return selector.val() as EspruinoBoards
-    }
-
-    throw new Error("User cancelled board selection.")
-  }
-
   async function uploadScript(e: Event | JQuery.Event) {
     try {
       await bluetoothOrError()
@@ -334,7 +277,7 @@ $(() => {
             message: "Downloading firmware",
             preventClose: true
           })
-          await updateFirmware(e, true, board as EspruinoBoards)
+          await updateFirmware(e, true)
         } else {
           return
         }
@@ -372,7 +315,7 @@ $(() => {
     }
   }
 
-  async function updateFirmware(e: Event | JQuery.Event, throwError?: boolean, board?: EspruinoBoards) {
+  async function updateFirmware(e: Event | JQuery.Event, throwError?: boolean) {
     let modalShown = false
     let canClose = true
 
@@ -425,7 +368,7 @@ $(() => {
 
       const dfu = new SecureDfuUpdate(status, log, progress)
 
-      await dfu.update(board || await hardwareChooser())
+      await dfu.update()
     } catch (error) {
       if (throwError) {
         throw error
@@ -451,9 +394,4 @@ $(() => {
   $("#puckName").on("click", changeName).prop("disabled", false)
   $("#uploadScript").on("click", uploadScript).prop("disabled", false)
   $("#updateFirmware").on("click", updateFirmware).prop("disabled", false)
-  $("#code, #readme a[href$='ntag215.js']").on("click", (e) => {
-    e.preventDefault()
-
-    selectText(scriptTextArea[0])
-  })
 })
